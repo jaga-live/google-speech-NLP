@@ -7,10 +7,14 @@ const container = new Container({ defaultScope: "Singleton" });
 
 /**Controllers */
 import "../app.controller";
+import { GoogleNaturalLanguageService } from "../modules/google-nlp/google-nlp.service";
 
 /**Service */
 container
   .bind<GoogleSpeechService>(TYPES.GoogleSpeechService)
   .to(GoogleSpeechService);
+container
+  .bind<GoogleNaturalLanguageService>(TYPES.GoogleNaturalLanguageService)
+  .to(GoogleNaturalLanguageService);
 
 export default container;

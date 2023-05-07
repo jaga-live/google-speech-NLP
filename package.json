@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/jaga-live/google-speech-NLP#readme",
   "dependencies": {
+    "@google-cloud/dlp": "^4.4.2",
+    "@google-cloud/language": "^5.2.2",
     "@google-cloud/speech": "^5.4.1",
     "@types/express": "^4.17.17",
     "@types/inversify": "^2.0.33",

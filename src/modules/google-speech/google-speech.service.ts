@@ -1,19 +1,9 @@
 import { injectable } from "inversify";
-import { SpeechClient } from "@google-cloud/speech";
-import path from "path";
+import { GCloud } from "../gcloud/gcloud";
 
 @injectable()
-export class GoogleSpeechService {
-  private speechClient: SpeechClient;
-
-  constructor() {
-    this.speechClient = new SpeechClient({
-      keyFile: path.join(__dirname, "../../../keys/kitty-chan-gcloud.json"),
-    });
-  }
-
+export class GoogleSpeechService extends GCloud {
   async speechToText(audioBase64: string) {
-    // The audio file's encoding, sample rate in hertz, and BCP-47 language code
     const audio = {
       content: audioBase64,
     };
@@ -27,7 +17,6 @@ export class GoogleSpeechService {
       config: config,
     } as any;
 
-    // Detects speech in the audio file
     const [response] = await this.speechClient.recognize(request);
     const transcription = response.results
       .map((result) => result.alternatives[0].transcript)
