@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { InversifyExpressServer } from "inversify-express-utils";
 import container from "./core/inversify.di";
 import express from "express";
-
+import "./modules/tensorflow/tensorflow.service";
 class App {
   async bootstrap() {
     const server = new InversifyExpressServer(container);
