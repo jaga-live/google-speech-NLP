@@ -8,8 +8,10 @@ const container = new Container({ defaultScope: "Singleton" });
 /**Controllers */
 import "../app.controller";
 import { GoogleNaturalLanguageService } from "../modules/google-nlp/google-nlp.service";
+import { AppService } from "../modules/app.service";
 
 /**Service */
+container.bind<AppService>(TYPES.AppService).to(AppService);
 container
   .bind<GoogleSpeechService>(TYPES.GoogleSpeechService)
   .to(GoogleSpeechService);
