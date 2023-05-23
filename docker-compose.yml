@@ -5,5 +5,5 @@ services:
     image: google-speech-nlp
     container_name: google-speech-nlp
     ports:
-      - "5000:5000"
+      - "5009:5000"
     restart: always
