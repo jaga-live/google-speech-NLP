@@ -2,6 +2,8 @@ import React, { useState, useRef } from "react";
 import axios from "axios";
 import "./recorder.css";
 
+let api = 'https://speech-beta.jaga.live/api';
+
 function Recorder() {
   const [recording, setRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState(null);
@@ -52,7 +54,7 @@ function Recorder() {
       formData.append("file", audioBlob, "recording.wav");
 
       axios
-        .post("http://localhost:5000/api/search/speech", formData)
+        .post(`${api}/search/speech`, formData)
         .then((response) => {
           console.log("Audio uploaded successfully:", response.data);
           setApiResponse(response.data);
