@@ -19,7 +19,12 @@ export class AppService {
       return {};
     }
 
-    return this.extractEntity(transcription);
+    const entity = await this.extractEntity(transcription);
+
+    return {
+      rawSpeechText: transcription || "",
+      entity,
+    };
   }
 
   /**Using Regex to extract entities and correct common type errors from Google Speech API
@@ -30,19 +35,18 @@ export class AppService {
     const query: any = {};
 
     /**Email Extraction */
-    const emailRegex =
-      /(?<=email\s+)([A-Za-z0-9\s]+(\.\s+)?)+at\s+([A-Za-z0-9.-]+\.[A-Za-z]{2,})/gi;
+    const emailRegex = /email\s+(.*?)\s+at\s+([\w.-]+(?:\.[\w-]+)*)/i;
 
     const emailMatch = text.match(emailRegex);
 
     if (emailMatch && emailMatch.length > 0) {
-      const parts = emailMatch[0].split(" at ");
-      const value = parts[0]
+      const value = emailMatch[1]
         .trim()
         .replace(/\s+hyphen\s+/gi, "-")
         .replace(/\s+underscore\s+/gi, "_")
         .replace(/\s/g, "");
-      const domain = parts[1].trim();
+      const domain = emailMatch[2].trim();
+
       query.email = `${value.toLowerCase()}@${domain.toLowerCase()}`;
     }
 
@@ -74,15 +78,57 @@ export class AppService {
     }
 
     /**Address*/
-    const addressExtraction = await this.addressNLPExtraction(text);
-    if (addressExtraction) {
-      query.ADDRESS1 = addressExtraction;
-    }
+    // const addressExtraction = await this.addressNLPExtraction(text);
+    // if (addressExtraction) {
+    //   query.ADDRESS1 = addressExtraction;
+    // }
 
     return query;
   }
 
   async addressNLPExtraction(text: string): Promise<string | null> {
-    return null;
+    const entity = await this.languageService.entityAnalysis(text);
+    if (!entity || entity.length === 0) {
+      return null;
+    }
+
+    const addressKey = "address";
+    const locationType = "LOCATION";
+
+    // Find the index of the address key in the sentence
+    const addressKeyIndex = text.toLowerCase().indexOf(addressKey);
+
+    if (addressKeyIndex === -1) {
+      return null; // Address key not found
+    }
+
+    // Extract the substring starting from the address key
+    const addressSubstr = text
+      .substring(addressKeyIndex + addressKey.length)
+      .trim();
+
+    console.log(addressSubstr, "Sub string");
+    // Find the location entity after the address key
+    const locationEntity = entity.find(
+      (entity) => entity.type === locationType
+    );
+
+    if (!locationEntity) {
+      return null; // Location entity not found
+    }
+
+    const locationName = locationEntity.name.toLowerCase();
+    const locationIndex = addressSubstr.toLowerCase().indexOf(locationName);
+
+    if (locationIndex === -1) {
+      return null; // Location entity not found within the address substring
+    }
+
+    // Extract the address substring from the start to the location entity's name
+    const address = addressSubstr
+      .substring(0, locationIndex + locationName.length)
+      .trim();
+
+    return address || null;
   }
 }

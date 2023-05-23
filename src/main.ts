@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { InversifyExpressServer } from "inversify-express-utils";
 import container from "./core/inversify.di";
 import express from "express";
+import cors from "cors";
 // import "./modules/tensorflow/tensorflow.service";
 
 class App {
@@ -11,6 +12,7 @@ class App {
     ///Express Config
     server.setConfig((app) => {
       app.use(express.json());
+      app.use(cors());
     });
 
     const app = server.build();
