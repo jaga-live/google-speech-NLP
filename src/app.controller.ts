@@ -7,7 +7,7 @@ import { GoogleSpeechService } from "./modules/google-speech/google-speech.servi
 import { GoogleNaturalLanguageService } from "./modules/google-nlp/google-nlp.service";
 import { AppService } from "./modules/app.service";
 
-@controller("")
+@controller("/api")
 export class AppController {
   constructor(
     @inject(TYPES.GoogleSpeechService)

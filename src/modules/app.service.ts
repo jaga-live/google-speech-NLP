@@ -78,10 +78,10 @@ export class AppService {
     }
 
     /**Address*/
-    // const addressExtraction = await this.addressNLPExtraction(text);
-    // if (addressExtraction) {
-    //   query.ADDRESS1 = addressExtraction;
-    // }
+    const addressExtraction = await this.addressNLPExtraction(text);
+    if (addressExtraction) {
+      query.ADDRESS1 = addressExtraction;
+    }
 
     return query;
   }

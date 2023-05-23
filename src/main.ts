@@ -3,6 +3,7 @@ import { InversifyExpressServer } from "inversify-express-utils";
 import container from "./core/inversify.di";
 import express from "express";
 import cors from "cors";
+import path from "path";
 // import "./modules/tensorflow/tensorflow.service";
 
 class App {
@@ -19,6 +20,9 @@ class App {
     app.listen(5000, () => {
       console.log("Express Server up and running");
     });
+
+    /**Server React App */
+    app.use(express.static(path.join(__dirname, "../client/build")));
   }
 }
 

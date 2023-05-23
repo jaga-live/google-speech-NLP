@@ -1,37 +1,42 @@
-import React, { useState, useRef } from 'react';
-import axios from 'axios';
-import './recorder.css'
+import React, { useState, useRef } from "react";
+import axios from "axios";
+import "./recorder.css";
+
 function Recorder() {
   const [recording, setRecording] = useState(false);
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
-  const [stream, setStream] = useState<MediaStream | null>(null);
-  const audioRef = useRef<MediaRecorder | null>(null);
-  const [apiResponse, setApiResponse] = useState({ rawSpeechText: 'hello teher aas da asd ad ', entity: {} });
+  const [audioBlob, setAudioBlob] = useState(null);
+  const [stream, setStream] = useState(null);
+  const audioRef = useRef(null);
+  const [apiResponse, setApiResponse] = useState({
+    rawSpeechText: "Raw text from Speech API",
+    entity: {},
+  });
 
   const startRecording = () => {
     setRecording(true);
 
     const constraints = { audio: true };
-    navigator.mediaDevices.getUserMedia(constraints)
+    navigator.mediaDevices
+      .getUserMedia(constraints)
       .then((stream) => {
         setStream(stream);
         audioRef.current = new MediaRecorder(stream);
 
-        const chunks: BlobPart[] = [];
+        const chunks = [];
         audioRef.current.ondataavailable = (event) => {
           chunks.push(event.data);
         };
 
         audioRef.current.onstop = () => {
           setRecording(false);
-          const blob = new Blob(chunks, { type: 'audio/wav' });
+          const blob = new Blob(chunks, { type: "audio/wav" });
           setAudioBlob(blob);
         };
 
         audioRef.current.start();
       })
       .catch((error) => {
-        console.error('Error accessing microphone:', error);
+        console.error("Error accessing microphone:", error);
       });
   };
 
@@ -41,21 +46,22 @@ function Recorder() {
     }
   };
 
-const uploadAudio = () => {
-  if (audioBlob) {
-    const formData = new FormData();
-    formData.append('file', audioBlob, 'recording.wav');
+  const uploadAudio = () => {
+    if (audioBlob) {
+      const formData = new FormData();
+      formData.append("file", audioBlob, "recording.wav");
 
-    axios.post('http://localhost:5000/search/speech', formData)
-      .then((response) => {
-        console.log('Audio uploaded successfully:', response.data);
-        setApiResponse(response.data);
-      })
-      .catch((error) => {
-        console.error('Error uploading audio:', error);
-      });
-  }
-};
+      axios
+        .post("http://localhost:5000/api/search/speech", formData)
+        .then((response) => {
+          console.log("Audio uploaded successfully:", response.data);
+          setApiResponse(response.data);
+        })
+        .catch((error) => {
+          console.error("Error uploading audio:", error);
+        });
+    }
+  };
 
   return (
     <div className="recorder">
@@ -81,12 +87,10 @@ const uploadAudio = () => {
   );
 }
 
-function App() {
+export default function App() {
   return (
     <div className="App">
       <Recorder />
     </div>
   );
 }
-
-export default App;

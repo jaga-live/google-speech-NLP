@@ -1,0 +1,9 @@
+version: "3.9"
+services:
+  google-speech-nlp:
+    build: .
+    image: google-speech-nlp
+    container_name: google-speech-nlp
+    ports:
+      - "5000:5000"
+    restart: always
