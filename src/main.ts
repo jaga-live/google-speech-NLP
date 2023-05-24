@@ -4,7 +4,6 @@ import container from "./core/inversify.di";
 import express from "express";
 import cors from "cors";
 import path from "path";
-// import "./modules/tensorflow/tensorflow.service";
 
 class App {
   async bootstrap() {

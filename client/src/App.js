@@ -1,6 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import "./recorder.css";
+import "./search.css"
 
 let api = 'https://speech-beta.jaga.live/api';
 
@@ -13,6 +14,17 @@ function Recorder() {
     rawSpeechText: "Raw text from Speech API",
     entity: {},
   });
+  const [searchQuery, setSearchQuery] = useState("");
+  
+    useEffect(() => {
+      return () => {
+        if (stream) {
+          stream.getTracks().forEach((track) => {
+            track.stop();
+          });
+        }
+      };
+    }, [stream]);
 
   const startRecording = () => {
     setRecording(true);
@@ -65,6 +77,18 @@ function Recorder() {
     }
   };
 
+    const handleSearch = () => {
+      axios
+        .get(`${api}/search/text?query=${searchQuery}`)
+        .then((response) => {
+          console.log("Search API response:", response.data);
+          setApiResponse(response.data);
+        })
+        .catch((error) => {
+          console.error("Error performing search:", error);
+        });
+    };
+
   return (
     <div className="recorder">
       <div className="recorder-controls">
@@ -78,10 +102,24 @@ function Recorder() {
           Upload Audio
         </button>
       </div>
+      <div className="search-bar">
+        <input
+          className="search-input"
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button className="search-button" onClick={handleSearch}>
+          Search
+        </button>
+      </div>
       {apiResponse.rawSpeechText && (
         <div className="api-response">
           <h2>API Response</h2>
-          <p>Raw Speech Text: {apiResponse.rawSpeechText}</p>
+          <p>
+            <strong>Raw Speech Text:</strong>{" "}
+            <span>{apiResponse.rawSpeechText}</span>
+          </p>
           <pre>{JSON.stringify(apiResponse.entity, null, 2)}</pre>
         </div>
       )}

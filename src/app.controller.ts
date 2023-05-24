@@ -1,5 +1,10 @@
 import { inject } from "inversify";
-import { controller, httpPost } from "inversify-express-utils";
+import {
+  controller,
+  httpGet,
+  httpPost,
+  queryParam,
+} from "inversify-express-utils";
 import multer from "multer";
 import { Request } from "express";
 import { TYPES } from "./core/types";
@@ -25,15 +30,15 @@ export class AppController {
     return this.appService.voiceSearch(audioBase64);
   }
 
+  @httpGet("/search/text")
+  async language(@queryParam("query") query: string) {
+    return this.appService.entity(query);
+  }
+
   @httpPost("/speech", multer().single("file"))
   async speech(req: Request) {
     const audioBase64 = Buffer.from(req.file.buffer).toString("base64");
 
     return this.googleSpeech.speechToText(audioBase64);
-  }
-
-  @httpPost("/entity")
-  async language(req: Request) {
-    return this.naturalLanguage.entityAnalysis(req.body.query);
   }
 }

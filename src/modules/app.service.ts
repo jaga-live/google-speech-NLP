@@ -27,6 +27,15 @@ export class AppService {
     };
   }
 
+  async entity(text: string) {
+    const entity = await this.extractEntity(text);
+
+    return {
+      rawSpeechText: text || "",
+      entity,
+    };
+  }
+
   /**Using Regex to extract entities and correct common type errors from Google Speech API
    *
    * For Address we may need to use Google NLP API
@@ -60,7 +69,7 @@ export class AppService {
     }
 
     /**SSN extraction */
-    const ssnRegex = /(?<=ssn|ssin\s+)([\d\s]+[\d])/gi;
+    const ssnRegex = /(?<=ssn|ssin|sm\s+)([\d\s]+[\d])/gi;
     const ssnMatch = text.match(ssnRegex);
 
     if (ssnMatch && ssnMatch.length > 0) {
@@ -69,7 +78,7 @@ export class AppService {
     }
 
     /**MRN extraction */
-    const mrnRegex = /(?<=mrn|m r n\s+)([\d\s]+[\d])/gi;
+    const mrnRegex = /(?<=mrn|m r n|modern|ameren\s+)([\d\s]+[\d])/gi;
     const mrnMatch = text.match(mrnRegex);
 
     if (mrnMatch && mrnMatch.length > 0) {
