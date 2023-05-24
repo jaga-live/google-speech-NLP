@@ -23,7 +23,7 @@ export class AppService {
 
     return {
       rawSpeechText: transcription || "",
-      entity,
+      ...entity,
     };
   }
 
@@ -32,7 +32,7 @@ export class AppService {
 
     return {
       rawSpeechText: text || "",
-      entity,
+      ...entity,
     };
   }
 
@@ -40,8 +40,8 @@ export class AppService {
    *
    * For Address we may need to use Google NLP API
    */
-  async extractEntity(text: string) {
-    const query: any = {};
+  private async extractEntity(text: string) {
+    const entity: any = {};
 
     /**Email Extraction */
     const emailRegex = /email\s+(.*?)\s+at\s+([\w.-]+(?:\.[\w-]+)*)/i;
@@ -56,7 +56,7 @@ export class AppService {
         .replace(/\s/g, "");
       const domain = emailMatch[2].trim();
 
-      query.email = `${value.toLowerCase()}@${domain.toLowerCase()}`;
+      entity.email = `${value.toLowerCase()}@${domain.toLowerCase()}`;
     }
 
     /**Phone extraction */
@@ -65,7 +65,7 @@ export class AppService {
 
     if (phoneMatch && phoneMatch.length > 0) {
       const phoneNumber = phoneMatch[0].replace(/\s/g, "");
-      query.phone = phoneNumber;
+      entity.phone = phoneNumber;
     }
 
     /**SSN extraction */
@@ -74,7 +74,7 @@ export class AppService {
 
     if (ssnMatch && ssnMatch.length > 0) {
       const ssnNumber = ssnMatch[0].replace(/\s/g, "");
-      query.SSN = ssnNumber;
+      entity.SSN = ssnNumber;
     }
 
     /**MRN extraction */
@@ -83,19 +83,22 @@ export class AppService {
 
     if (mrnMatch && mrnMatch.length > 0) {
       const mrnNumber = mrnMatch[0].replace(/\s/g, "");
-      query.MRN = mrnNumber;
+      entity.MRN = mrnNumber;
     }
 
     /**Address*/
     const addressExtraction = await this.addressNLPExtraction(text);
     if (addressExtraction) {
-      query.ADDRESS1 = addressExtraction;
+      entity.ADDRESS1 = addressExtraction;
     }
 
-    return query;
+    return {
+      entity,
+      query: this.buildQueryFromEntity(entity),
+    };
   }
 
-  async addressNLPExtraction(text: string): Promise<string | null> {
+  private async addressNLPExtraction(text: string): Promise<string | null> {
     const entity = await this.languageService.entityAnalysis(text);
     if (!entity || entity.length === 0) {
       return null;
@@ -139,5 +142,11 @@ export class AppService {
       .trim();
 
     return address || null;
+  }
+
+  private buildQueryFromEntity(entity: any) {
+    return Object.entries(entity)
+      .map(([key, value]) => `${key.toUpperCase()}:${value ? value : "value"}`)
+      .join(";");
   }
 }

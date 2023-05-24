@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import "./recorder.css";
-import "./search.css"
+import "./search.css";
 
 let api = 'https://speech-beta.jaga.live/api';
 
@@ -13,18 +13,19 @@ function Recorder() {
   const [apiResponse, setApiResponse] = useState({
     rawSpeechText: "Raw text from Speech API",
     entity: {},
+    query: "",
   });
   const [searchQuery, setSearchQuery] = useState("");
-  
-    useEffect(() => {
-      return () => {
-        if (stream) {
-          stream.getTracks().forEach((track) => {
-            track.stop();
-          });
-        }
-      };
-    }, [stream]);
+
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach((track) => {
+          track.stop();
+        });
+      }
+    };
+  }, [stream]);
 
   const startRecording = () => {
     setRecording(true);
@@ -77,17 +78,17 @@ function Recorder() {
     }
   };
 
-    const handleSearch = () => {
-      axios
-        .get(`${api}/search/text?query=${searchQuery}`)
-        .then((response) => {
-          console.log("Search API response:", response.data);
-          setApiResponse(response.data);
-        })
-        .catch((error) => {
-          console.error("Error performing search:", error);
-        });
-    };
+  const handleSearch = () => {
+    axios
+      .get(`${api}/search/text?query=${searchQuery}`)
+      .then((response) => {
+        console.log("Search API response:", response.data);
+        setApiResponse(response.data);
+      })
+      .catch((error) => {
+        console.error("Error performing search:", error);
+      });
+  };
 
   return (
     <div className="recorder">
@@ -116,11 +117,18 @@ function Recorder() {
       {apiResponse.rawSpeechText && (
         <div className="api-response">
           <h2>API Response</h2>
-          <p>
-            <strong>Raw Speech Text:</strong>{" "}
-            <span>{apiResponse.rawSpeechText}</span>
-          </p>
-          <pre>{JSON.stringify(apiResponse.entity, null, 2)}</pre>
+          <div className="api-section">
+            <h3>Raw Speech Text:</h3>
+            <p>{apiResponse.rawSpeechText}</p>
+          </div>
+          <div className="api-section">
+            <h3>Entity:</h3>
+            <pre>{JSON.stringify(apiResponse.entity, null, 2)}</pre>
+          </div>
+          <div className="api-section">
+            <h3>Query:</h3>
+            <p>"{apiResponse.query}"</p>
+          </div>
         </div>
       )}
     </div>
